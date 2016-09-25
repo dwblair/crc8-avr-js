@@ -7,3 +7,12 @@
 Using same string inputs and polynomials, this might be useful for seeing whether a string generated on the Arduino has been communicated successfully to browser.
 
 The idea would be to generate the checksum for any given text to be sent from the Arduino, and append it to the message.  Then the browser can parse the input message, generate the checksum for it, and compare it to the checksum sent by the Arduino.
+
+
+# References
+
+- General explanation: https://en.wikipedia.org/wiki/Cyclic_redundancy_check
+
+- C code (for Arduino): http://www.barrgroup.com/Embedded-Systems/How-To/CRC-Calculation-C-Code
+
+- Javascript: https://github.com/SheetJS/js-crc32
