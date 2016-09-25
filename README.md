@@ -1,12 +1,9 @@
-# crc8-avr-js
-Computing crc8 on avr system to match javascript in browser ... 
+# Demo
 
-refs:
+**crc8.ino**, if loaded onto an Arduino board, will generate the appropriate CRC8 checksum for a given string input and choice of CRC8 input polynomial, and prints it to the serial port.
 
-c code on avr: 
+**crc8.js**, loaded into **index.html**, logs the CRC8 checkum for a given string input and choice of CRC8 polynomial, and logs it to console.log.
 
-http://www.barrgroup.com/Embedded-Systems/How-To/CRC-Calculation-C-Code
+Using same string inputs and polynomials, this might be useful for seeing whether a string generated on the Arduino has been communicated successfully to browser.
 
-javascript:
 
-https://github.com/mode80/crc8js
