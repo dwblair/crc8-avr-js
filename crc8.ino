@@ -1,46 +1,25 @@
 typedef uint8_t crc;
-//#define POLYNOMIAL 0xD8  /* 11011 followed by 0's */
-
-#define POLYNOMIAL 0x07  /* CRC8_CCITT */
-
-
+#define POLYNOMIAL 0x07  /* CRC8_CCITT -- this polynomial needs to match choice on javascript end */
 #define WIDTH  (8 * sizeof(crc))
 #define TOPBIT (1 << (WIDTH - 1))
 
-void setup() {
-  // put your setup code here, to run once:
-  Serial.begin(9600);
+crc  crcTable[256];
 
-}
-
-void loop() {
-  // put your main code here, to run repeatedly:
-
-
-unsigned char  test[] = "hello";
-Serial.println(crcSlow(test, strlen(test)));
-//Serial.println("hello");
-
-delay(1000);
-
-
-}
-
-
-crc crcSlow(uint8_t const message[], int nBytes)
+void
+crcInit(void)
 {
-    crc  remainder = 0;  
+    crc  remainder;
 
 
     /*
-     * Perform modulo-2 division, a byte at a time.
+     * Compute the remainder of each possible dividend.
      */
-    for (int byte = 0; byte < nBytes; ++byte)
+    for (int dividend = 0; dividend < 256; ++dividend)
     {
         /*
-         * Bring the next byte into the remainder.
+         * Start with the dividend followed by zeros.
          */
-        remainder ^= (message[byte] << (WIDTH - 8));
+        remainder = dividend << (WIDTH - 8);
 
         /*
          * Perform modulo-2 division, a bit at a time.
@@ -49,7 +28,7 @@ crc crcSlow(uint8_t const message[], int nBytes)
         {
             /*
              * Try to divide the current data bit.
-             */
+             */      
             if (remainder & TOPBIT)
             {
                 remainder = (remainder << 1) ^ POLYNOMIAL;
@@ -59,11 +38,55 @@ crc crcSlow(uint8_t const message[], int nBytes)
                 remainder = (remainder << 1);
             }
         }
+
+        /*
+         * Store the result into the table.
+         */
+        crcTable[dividend] = remainder;
+    }
+
+}   /* crcInit() */
+
+crc
+crcFast(uint8_t const message[], int nBytes)
+{
+    uint8_t data;
+    crc remainder = 0;
+
+
+    /*
+     * Divide the message by the polynomial, a byte at a time.
+     */
+    for (int byte = 0; byte < nBytes; ++byte)
+    {
+        data = message[byte] ^ (remainder >> (WIDTH - 8));
+        remainder = crcTable[data] ^ (remainder << 8);
     }
 
     /*
-     * The final remainder is the CRC result.
+     * The final remainder is the CRC.
      */
     return (remainder);
 
-}   /* crcSlow() */
+}   /* crcFast() */
+
+
+void setup() {
+  // put your setup code here, to run once:
+  Serial.begin(9600);s
+  crcInit();
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+
+unsigned char  test[] = "hello";
+Serial.println(crcFast(test, strlen(test)));
+//Serial.println("hello");
+
+delay(1000);
+
+
+}
+
+
